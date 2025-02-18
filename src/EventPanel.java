@@ -16,23 +16,22 @@ public class EventPanel extends JPanel {
         this.add(nameLabel);
         this.add(dateLabel);
 
-        JCheckBox completeCheckBox = new JCheckBox("Complete", event instanceof Completable && ((Completable) event).isComplete());
-        completeCheckBox.addActionListener(e -> {
-            if (event instanceof Completable) {
-                ((Completable) event).complete();
-                JOptionPane.showMessageDialog(this, "Event marked as complete.");
-            }
-        });
-        this.add(completeCheckBox);
-
-
         if (event instanceof Completable) {
-            JButton completeButton = new JButton("Complete Event");
-            completeButton.addActionListener(e -> {
-                ((Completable) event).complete();
-                JOptionPane.showMessageDialog(this, "Event marked as complete.");
+            // Create a checkbox for "Complete Event"
+            JCheckBox completeCheckBox = new JCheckBox("Complete", event instanceof Completable && ((Completable) event).isComplete());
+            completeCheckBox.addActionListener(e -> {
+                if (event instanceof Completable) {
+                    // Mark the event as complete when checked
+                    ((Completable) event).complete();
+                    JOptionPane.showMessageDialog(this, "Event marked as complete.");
+
+                    // Change the UI appearance, like disabling the checkbox after completion
+                    completeCheckBox.setEnabled(false);  // Disable the checkbox after marking as complete
+                    nameLabel.setText(nameLabel.getText() + " (Completed)");  // Update label text to show completion
+                    setBackground(Color.GRAY);  // Gray out the event panel to show it's completed
+                }
             });
-            this.add(completeButton);
+            this.add(completeCheckBox);
         }
 
     }

@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class AddEventModal extends JDialog {
     public AddEventModal(EventListPanel parent) {  // Change parameter to EventListPanel
@@ -30,30 +32,50 @@ public class AddEventModal extends JDialog {
         add(new JLabel("DateTime:"));
         add(dateField);
 
+        // Add instruction label for DateTime format
+        JLabel dateTimeInstructionLabel = new JLabel("<html><i>Enter DateTime in format: yyyy-MM-dd HH:mm</i></html>");
+        add(dateTimeInstructionLabel);  // Display instruction label below the DateTime input
+
         JButton addButton = new JButton("Add");
+
+        // Use DateTimeFormatter for the friendly DateTime format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         addButton.addActionListener(e -> {
             String selectedType = (String) eventTypeComboBox.getSelectedItem();
-            LocalDateTime eventDate = LocalDateTime.parse(dateField.getText());
+            String dateText= dateField.getText();
 
-            if ("Meeting".equals(selectedType)) {
-                // Create a meeting
-                LocalDateTime endDate = eventDate.plusHours(Integer.parseInt(durationField.getText()));
-                Meeting meeting = new Meeting(nameField.getText(), eventDate, endDate, locationField.getText());
-                parent.addEvent(meeting);  // Use EventListPanel's addEvent method
-            } else if ("Deadline".equals(selectedType)) {
-                // Create a deadline
-                Deadline deadline = new Deadline(nameField.getText(), eventDate);
-                parent.addEvent(deadline);  // Use EventListPanel's addEvent method
+            try {
+                // Parse the input date using the formatter
+                LocalDateTime eventDate = LocalDateTime.parse(dateText, formatter);
+
+                if ("Meeting".equals(selectedType)) {
+                    // Create a meeting
+                    LocalDateTime endDate = eventDate.plusHours(Integer.parseInt(durationField.getText()));
+                    Meeting meeting = new Meeting(nameField.getText(), eventDate, endDate, locationField.getText());
+                    parent.addEvent(meeting);  // Use EventListPanel's addEvent method
+                } else if ("Deadline".equals(selectedType)) {
+                    // Create a deadline
+                    Deadline deadline = new Deadline(nameField.getText(), eventDate);
+                    parent.addEvent(deadline);  // Use EventListPanel's addEvent method
+                }
+
+                this.dispose();  // Close the modal after adding the event
+            } catch (DateTimeParseException ex) {
+                // Show error if the date format is incorrect
+                JOptionPane.showMessageDialog(this, "Invalid DateTime format. Please use yyyy-MM-dd HH:mm.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                // Show error if duration is not a valid number
+                JOptionPane.showMessageDialog(this, "Duration must be a valid number.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
-
-            this.dispose();
         });
 
         add(new JLabel("")); // Empty placeholder
         add(addButton);
 
-        setSize(300, 200);
+        setSize(300, 250);
         setLocationRelativeTo(parent);
     }
 }

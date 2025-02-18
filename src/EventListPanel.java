@@ -6,6 +6,7 @@ import java.util.Comparator;
 public class EventListPanel extends JPanel {
     private ArrayList<Event> events;
     private JPanel displayPanel;
+    private JPanel buttonPanel;  // New panel to hold buttons
 
     public EventListPanel() {
         events = new ArrayList<>();
@@ -13,86 +14,100 @@ public class EventListPanel extends JPanel {
         displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
 
         this.setLayout(new BorderLayout());
-        this.add(new JScrollPane(displayPanel), BorderLayout.CENTER);
 
+        // Create a panel for buttons with BoxLayout
+        buttonPanel = new JPanel();
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS)); // Stack buttons vertically
+
+        // Add buttons to the button panel
         JButton addEventButton = new JButton("Add Event");
         addEventButton.addActionListener(e -> showAddEventModal());
-        this.add(addEventButton, BorderLayout.NORTH);
+        buttonPanel.add(addEventButton);
 
-        // Add these lines in the constructor of your EventListPanel, after the other UI elements are initialized.
+        // Sort by Name Button
         JButton sortByNameButton = new JButton("Sort by Name");
-        sortByNameButton.addActionListener(e -> {
-            events.sort(Comparator.comparing(Event::getName));  // Sort events by name
-            refreshEventList();  // Re-render the list
-        });
-        add(sortByNameButton, BorderLayout.SOUTH);  // Example, adjust positioning as needed
+        sortByNameButton.addActionListener(e -> sortEvents(Comparator.comparing(Event::getName)));
+        buttonPanel.add(sortByNameButton);
 
+        // Sort by Reverse Name Button
         JButton sortByReverseNameButton = new JButton("Sort by Reverse Name");
-        sortByReverseNameButton.addActionListener(e -> {
-            events.sort((e1, e2) -> e2.getName().compareTo(e1.getName()));  // Sort events by reverse name
-            refreshEventList();
-        });
-        add(sortByReverseNameButton, BorderLayout.SOUTH);
+        sortByReverseNameButton.addActionListener(e -> sortEvents((e1, e2) -> e2.getName().compareTo(e1.getName())));
+        buttonPanel.add(sortByReverseNameButton);
 
+        // Sort by DateTime Button
         JButton sortByDateTimeButton = new JButton("Sort by DateTime");
-        sortByDateTimeButton.addActionListener(e -> {
-            events.sort(Comparator.comparing(Event::getDateTime));  // Sort events by dateTime
-            refreshEventList();
-        });
-        add(sortByDateTimeButton, BorderLayout.SOUTH);
+        sortByDateTimeButton.addActionListener(e -> sortEvents(Comparator.comparing(Event::getDateTime)));
+        buttonPanel.add(sortByDateTimeButton);
 
+        // Filter Completed Button
         JButton filterCompletedButton = new JButton("Filter Completed");
         filterCompletedButton.addActionListener(e -> {
+            // Remove completed events from the list
             events.removeIf(event -> event instanceof Completable && ((Completable) event).isComplete());
-            refreshEventList();
+            refreshEventList();  // Refresh the event list to update the display
         });
-        add(filterCompletedButton, BorderLayout.SOUTH);
+        buttonPanel.add(filterCompletedButton);
 
+        // Filter Deadlines Button
         JButton filterDeadlineButton = new JButton("Filter Deadlines");
         filterDeadlineButton.addActionListener(e -> {
+            // Remove Deadline events from the list
             events.removeIf(event -> event instanceof Deadline);
-            refreshEventList();
+            refreshEventList();  // Refresh the event list to update the display
         });
-        add(filterDeadlineButton, BorderLayout.SOUTH);
+        buttonPanel.add(filterDeadlineButton);
 
+        // Filter Meetings Button
         JButton filterMeetingButton = new JButton("Filter Meetings");
         filterMeetingButton.addActionListener(e -> {
+            // Remove Meeting events from the list
             events.removeIf(event -> event instanceof Meeting);
-            refreshEventList();
+            refreshEventList();  // Refresh the event list to update the display
         });
-        add(filterMeetingButton, BorderLayout.SOUTH);
+        buttonPanel.add(filterMeetingButton);
 
+        // Remove All Filters Button (reset all filters and show all events)
         JButton removeAllFiltersButton = new JButton("Remove All Filters");
         removeAllFiltersButton.addActionListener(e -> {
+            // Clear the events list and reload all events
             events.clear();
-            EventPlanner.addDefaultEvents(this);  // You could add this method to reload the default events
-            refreshEventList();
+            EventPlanner.addDefaultEvents(this);  // Add all events back
+            refreshEventList();  // Refresh the event list to show all events
         });
-        add(removeAllFiltersButton, BorderLayout.SOUTH);
+        buttonPanel.add(removeAllFiltersButton);
 
+        // Add button panel to the south region
+        this.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Display panel for events
+        this.add(new JScrollPane(displayPanel), BorderLayout.CENTER);
     }
-    // Define the refreshEventList method to update the display panel
+
+    // Helper method to sort events
+    private void sortEvents(Comparator<Event> comparator) {
+        events.sort(comparator);
+        refreshEventList();
+    }
+
+    // Refresh the event list display
     public void refreshEventList() {
-        displayPanel.removeAll();
+        displayPanel.removeAll();  // Clear existing panels
         for (Event event : events) {
-            EventPanel eventPanel = new EventPanel(event);
+            EventPanel eventPanel = new EventPanel(event);  // Create a new panel for each event
             displayPanel.add(eventPanel);
         }
-        displayPanel.revalidate();
-        displayPanel.repaint();
+        displayPanel.revalidate();  // Revalidate the panel to reflect changes
+        displayPanel.repaint();  // Repaint the panel to refresh UI
     }
 
+    // Add new event to the list
     public void addEvent(Event event) {
         events.add(event);
-        EventPanel eventPanel = new EventPanel(event);
-        displayPanel.add(eventPanel);
-        displayPanel.revalidate();
+        refreshEventList();  // Refresh the event list to show newly added event
     }
 
+    // Display modal to add event (this can be improved later)
     private void showAddEventModal() {
         JOptionPane.showMessageDialog(this, "Add Event Modal goes here.");
     }
-
-
-
 }

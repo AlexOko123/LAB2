@@ -3,6 +3,7 @@ import java.time.Duration;
 
 public class Meeting extends Event implements Completable {
     private LocalDateTime endDateTime;  // The end time of the meeting
+    private LocalDateTime startDateTime;
     private String location;  // The location of the meeting
     private boolean complete;  // Tracks if the meeting is marked as complete
 
