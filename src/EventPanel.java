@@ -16,6 +16,14 @@ public class EventPanel extends JPanel {
         this.add(nameLabel);
         this.add(dateLabel);
 
+        // Check if the event is a Meeting and display location
+        if (event instanceof Meeting) {
+            Meeting meeting = (Meeting) event;  // Cast event to Meeting
+            JLabel locationLabel = new JLabel("Location: " + meeting.getLocation());  // Create a label for location
+            this.add(locationLabel);  // Add location label to the panel
+        }
+
+
         if (event instanceof Completable) {
             // Create a checkbox for "Complete Event"
             JCheckBox completeCheckBox = new JCheckBox("Complete", event instanceof Completable && ((Completable) event).isComplete());

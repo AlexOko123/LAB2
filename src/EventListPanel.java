@@ -1,15 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 
 public class EventListPanel extends JPanel {
     private ArrayList<Event> events;
+    private ArrayList<Event> originalEvents;
     private JPanel displayPanel;
     private JPanel buttonPanel;  // New panel to hold buttons
 
     public EventListPanel() {
         events = new ArrayList<>();
+        originalEvents = new ArrayList<>(); // Initialize the original events list
         displayPanel = new JPanel();
         displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
 
@@ -69,10 +72,9 @@ public class EventListPanel extends JPanel {
         // Remove All Filters Button (reset all filters and show all events)
         JButton removeAllFiltersButton = new JButton("Remove All Filters");
         removeAllFiltersButton.addActionListener(e -> {
-            // Clear the events list and reload all events
-            events.clear();
-            EventPlanner.addDefaultEvents(this);  // Add all events back
-            refreshEventList();  // Refresh the event list to show all events
+
+            //Restore the original set of events
+            restoreOriginalEvents();
         });
         buttonPanel.add(removeAllFiltersButton);
 
@@ -81,6 +83,13 @@ public class EventListPanel extends JPanel {
 
         // Display panel for events
         this.add(new JScrollPane(displayPanel), BorderLayout.CENTER);
+    }
+
+    private void restoreOriginalEvents() {
+        // Restore the original events list and refresh the display
+        events.clear();
+        events.addAll(originalEvents); // Restore all events
+        refreshEventList();  // Refresh the event list to show all events
     }
 
     // Helper method to sort events
@@ -103,6 +112,7 @@ public class EventListPanel extends JPanel {
     // Add new event to the list
     public void addEvent(Event event) {
         events.add(event);
+        originalEvents.add(event);
         refreshEventList();  // Refresh the event list to show newly added event
     }
 
@@ -110,4 +120,6 @@ public class EventListPanel extends JPanel {
     private void showAddEventModal() {
         JOptionPane.showMessageDialog(this, "Add Event Modal goes here.");
     }
+
+
 }
