@@ -15,6 +15,11 @@ public class EventPlanner {
         addDefaultEvents(eventListPanel);
         frame.add(eventListPanel);
 
+        // Modify the button to open AddEventModal with EventListPanel as parent
+        JButton addEventButton = new JButton("Add Event");
+        addEventButton.addActionListener(e -> new AddEventModal(eventListPanel).setVisible(true));  // Pass EventListPanel here
+        eventListPanel.add(addEventButton, BorderLayout.NORTH);
+
         frame.setVisible(true);
     }
 

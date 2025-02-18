@@ -16,6 +16,16 @@ public class EventPanel extends JPanel {
         this.add(nameLabel);
         this.add(dateLabel);
 
+        JCheckBox completeCheckBox = new JCheckBox("Complete", event instanceof Completable && ((Completable) event).isComplete());
+        completeCheckBox.addActionListener(e -> {
+            if (event instanceof Completable) {
+                ((Completable) event).complete();
+                JOptionPane.showMessageDialog(this, "Event marked as complete.");
+            }
+        });
+        this.add(completeCheckBox);
+
+
         if (event instanceof Completable) {
             JButton completeButton = new JButton("Complete Event");
             completeButton.addActionListener(e -> {
@@ -24,5 +34,6 @@ public class EventPanel extends JPanel {
             });
             this.add(completeButton);
         }
+
     }
 }
